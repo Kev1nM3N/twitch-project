@@ -1,7 +1,8 @@
 import { Webhook } from 'svix'
 import { headers } from 'next/headers'
 import { WebhookEvent } from '@clerk/nextjs/server'
-//1:56:49
+import { db } from '@/lib/db'
+//2:03:41
 
 export async function POST(req: Request) {
     // You can find this in the Clerk Dashboard -> Webhooks -> choose the webhook
@@ -47,12 +48,40 @@ export async function POST(req: Request) {
     })
   }
 
-    // Get the ID and type
-    const { id } = evt.data;
+    
     const eventType = evt.type;
    
-    console.log(`Webhook with and ID of ${id} and type of ${eventType}`)
-    // console.log('Webhook body:', body)
+    if (eventType === "user.created"){
+        await db.user.create({
+          data: {
+            extesrnalUserId: payload.data.id,
+            username: payload.data.username,
+            imageURL: payload.data.image_url,
+          }
+        })
+    }
+
+    if (eventType === "user.updated"){
+      const currentUser = await db.user.findUnique({
+        where: {
+          extesrnalUserId: payload.data.id,
+        }
+      });
+
+      if (!currentUser) {
+        return new Response("User not found", { status:404 });
+      }
+
+      await db.user.update({
+        where: {
+          extesrnalUserId: payload.data.id,
+        },
+        data: {
+          username: payload.data.username,
+          imageURL: payload.data.image_url,
+        },
+      });
+    }
    
     return new Response('', { status: 200 })
 }
