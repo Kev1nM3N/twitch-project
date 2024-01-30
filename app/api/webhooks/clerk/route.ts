@@ -62,16 +62,6 @@ export async function POST(req: Request) {
     }
 
     if (eventType === "user.updated"){
-      const currentUser = await db.user.findUnique({
-        where: {
-          extesrnalUserId: payload.data.id,
-        }
-      });
-
-      if (!currentUser) {
-        return new Response("User not found", { status:404 });
-      }
-
       await db.user.update({
         where: {
           extesrnalUserId: payload.data.id,
@@ -79,6 +69,14 @@ export async function POST(req: Request) {
         data: {
           username: payload.data.username,
           imageURL: payload.data.image_url,
+        },
+      });
+    }
+
+    if (eventType === "user.deleted"){
+      await db.user.delete({
+        where: {
+          extesrnalUserId: payload.data.id,
         },
       });
     }
