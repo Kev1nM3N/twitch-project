@@ -1,14 +1,28 @@
 "use client"
-import queryString from "query-string";
+import qs from "query-string";
 import { useState } from "react";
 import { SearchIcon, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-//2:23:28
+//2:26:15
 
 export const Search = () => {
-    console.log('i am logged here');
+    const router = useRouter();
+    const [value, setValue] = useState("");
+
+    const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+
+        if (!value) return null;
+
+        const url = qs.stringifyUrl({
+            url: "/",
+            query: { term: value },
+        }, { skipEmptyString: true });
+
+        router.push(url);
+    };
 
     return (
         <form
@@ -16,6 +30,8 @@ export const Search = () => {
         className="relative w-full lg:w-[400px] flex items-center">
             <Input
                 placeholder="Search"
+                className="rounded-r-none focus-visible:ring-0
+                focus-visible:ring-transparent focus-visible:ring-offset-0"
             />
             <Button 
             type="submit"
