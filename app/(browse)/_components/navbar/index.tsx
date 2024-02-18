@@ -1,5 +1,6 @@
 import { Logo } from "./logo"
 import { Search } from "./search"
+//2:29:42
 
 export const Navbar = () => {
     return (
